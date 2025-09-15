@@ -825,7 +825,7 @@
                     // Basculer vers le dashboard
                     document.querySelector('[data-section="dashboard"]').click();
                 } else {
-                    showAlert(data.message || 'Erreur de connexion', 'error');
+                    showAlert(data.error || 'Erreur de connexion', 'error');
                 }
             } catch (error) {
                 showAlert('Erreur de connexion au serveur', 'error');
@@ -857,7 +857,7 @@
                     // Inscription réussie
                     showAlert('Compte créé avec succès ! Vous pouvez maintenant vous connecter.');
                 } else {
-                    showAlert(data.message || 'Erreur lors de la création du compte', 'error');
+                    showAlert(data.error || 'Erreur lors de la création du compte', 'error');
                 }
             } catch (error) {
                 showAlert('Erreur de connexion au serveur', 'error');
@@ -888,7 +888,6 @@
                 
                 // Si l'utilisateur est connecté, utiliser l'endpoint avec token
                 if (jwtToken) {
-                    endpoint = `${API_BASE}/v1/chat/completions`;
                     options.headers.Authorization = `Bearer ${jwtToken}`;
                 }
                 
@@ -897,7 +896,7 @@
                 
                 if (response.ok) {
                     // Ajouter la réponse de l'IA au chat
-                    addMessageToChat(data.response || data.message, 'ai');
+                    addMessageToChat(data.reply, 'ai');
                 } else {
                     addMessageToChat('Désolé, une erreur s\'est produite. Veuillez réessayer.', 'ai');
                 }
@@ -936,7 +935,7 @@
                 
                 if (response.ok) {
                     const data = await response.json();
-                    document.getElementById('balance-amount').textContent = `${data.balance} tokens`;
+                    document.getElementById('balance-amount').textContent = `${data.sc_balance} tokens`;
                     document.getElementById('balance-update-time').textContent = new Date().toLocaleTimeString();
                 }
             } catch (error) {
@@ -950,32 +949,21 @@
                 return;
             }
             
-            const amount = document.getElementById('convert-amount').value;
-            const from = document.getElementById('convert-from').value;
-            const to = document.getElementById('convert-to').value;
-            
-            if (!amount || amount <= 0) {
-                showAlert('Veuillez entrer un montant valide', 'error');
-                return;
-            }
-            
             try {
                 const response = await fetch(`${API_BASE}/user/convert`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
                         'Authorization': `Bearer ${jwtToken}`
-                    },
-                    body: JSON.stringify({ amount, from, to })
+                    }
                 });
                 
                 const data = await response.json();
                 
                 if (response.ok) {
-                    showAlert(`Conversion réussie: ${amount} ${from} -> ${data.result} ${to}`);
+                    showAlert(`Conversion réussie! ${data.message}`);
                     loadBalance(); // Recharger le solde
                 } else {
-                    showAlert(data.message || 'Erreur lors de la conversion', 'error');
+                    showAlert(data.error || 'Erreur lors de la conversion', 'error');
                 }
             } catch (error) {
                 showAlert('Erreur de connexion au serveur', 'error');
@@ -998,9 +986,15 @@
                 if (response.ok) {
                     const transactions = await response.json();
                     displayTransactions(transactions);
+                } else if (response.status === 404) {
+                    // Endpoint non trouvé, on affiche un message
+                    const container = document.getElementById('transactions-list');
+                    container.innerHTML = '<p class="text-center">L\'historique des transactions n\'est pas disponible pour le moment.</p>';
                 }
             } catch (error) {
                 console.error('Transactions load error:', error);
+                const container = document.getElementById('transactions-list');
+                container.innerHTML = '<p class="text-center">Erreur lors du chargement des transactions.</p>';
             }
         }
 
@@ -1026,10 +1020,10 @@
                         <i class="fas ${icon}"></i>
                     </div>
                     <div class="transaction-details">
-                        <div class="transaction-title">${transaction.description || 'Transaction'}</div>
-                        <div class="transaction-date">${new Date(transaction.date).toLocaleDateString()}</div>
+                        <div class="transaction-title">${transaction.type}</div>
+                        <div class="transaction-date">${new Date(transaction.timestamp).toLocaleDateString()}</div>
                     </div>
-                    <div class="transaction-amount ${amountClass}">${sign}${transaction.amount} ${transaction.currency}</div>
+                    <div class="transaction-amount ${amountClass}">${sign}${transaction.amount}</div>
                 `;
                 
                 container.appendChild(item);
@@ -1066,7 +1060,7 @@
                     // Rediriger vers la page de paiement Stripe
                     window.location.href = data.url;
                 } else {
-                    showAlert(data.message || 'Erreur lors de la création du paiement', 'error');
+                    showAlert(data.error || 'Erreur lors de la création du paiement', 'error');
                 }
             } catch (error) {
                 showAlert('Erreur de connexion au serveur', 'error');
@@ -1092,10 +1086,7 @@
             }
             
             try {
-                // Déterminer l'endpoint en fonction du rôle utilisateur
-                const endpoint = `${API_BASE}/user/api-token`;
-                
-                const response = await fetch(endpoint, {
+                const response = await fetch(`${API_BASE}/user/api-token`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${jwtToken}`
@@ -1105,12 +1096,12 @@
                 const data = await response.json();
                 
                 if (response.ok) {
-                    apiToken = data.token;
+                    apiToken = data.api_token;
                     localStorage.setItem('apiToken', apiToken);
                     displayApiToken();
                     showAlert('Nouveau token API généré avec succès');
                 } else {
-                    showAlert(data.message || 'Erreur lors de la génération du token', 'error');
+                    showAlert(data.error || 'Erreur lors de la génération du token', 'error');
                 }
             } catch (error) {
                 showAlert('Erreur de connexion au serveur', 'error');
