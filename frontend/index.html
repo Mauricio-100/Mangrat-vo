@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mangrat v4oplus</title>
+    <style>
+        /* Variables et reset */
+        :root {
+            --primary-color: #4a00e0;
+            --secondary-color: #8e2de2;
+            --accent-color: #00c6ff;
+            --dark-color: #1a1a2e;
+            --light-color: #f8f9fa;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --gray-color: #6c757d;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f4f7fe;
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem 0;
+            box-shadow: var(--box-shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo span {
+            color: var(--accent-color);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav li {
+            margin-left: 1.5rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+        nav a:hover, nav a.active {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Main content */
+        main {
+            flex: 1;
+            padding: 2rem 0;
+        }
+
+        .section {
+            display: none;
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #eee;
+        }
+
+        /* Form styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(74, 0, 224, 0.1);
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        button.secondary {
+            background: var(--gray-color);
+        }
+
+        /* Chat section */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            border-radius: var(--border-radius);
+            max-width: 80%;
+        }
+
+        .user-message {
+            background-color: var(--primary-color);
+            color: white;
+            margin-left: auto;
+        }
+
+        .ai-message {
+            background-color: #e9ecef;
+            color: #333;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 1rem;
+            background-color: white;
+            border-top: 1px solid #ddd;
+        }
+
+        .chat-input input {
+            flex: 1;
+            margin-right: 0.5rem;
+        }
+
+        /* Dashboard */
+        .balance-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .balance-amount {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+
+        .convert-form {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .convert-form input, .convert-form select {
+            flex: 1;
+        }
+
+        /* Transactions */
+        .transactions-list {
+            margin-top: 1.5rem;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-amount.positive {
+            color: var(--success-color);
+            font-weight: bold;
+        }
+
+        .transaction-amount.negative {
+            color: var(--danger-color);
+            font-weight: bold;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 2rem 0;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .about-btn {
+            background: none;
+            border: 1px solid white;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .about-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .about-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+            text-align: center;
+        }
+
+        .about-content.expanded {
+            max-height: 500px;
+        }
+
+        .about-content h3 {
+            margin: 1.5rem 0 1rem;
+            color: var(--accent-color);
+        }
+
+        .model-list {
+            list-style: none;
+            margin: 1rem 0;
+        }
+
+        .model-list li {
+            margin-bottom: 0.5rem;
+            padding-left: 1rem;
+            position: relative;
+        }
+
+        .model-list li:before {
+            content: "•";
+            color: var(--accent-color);
+            position: absolute;
+            left: 0;
+        }
+
+        .signature {
+            margin-top: 2rem;
+            font-style: italic;
+            opacity: 0.8;
+        }
+
+        /* Messages */
+        .alert {
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+        }
+
+        .alert-error {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: var(--danger-color);
+            border: 1px solid var(--danger-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            nav ul {
+                margin-top: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            nav li {
+                margin: 0.5rem;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+            }
+
+            .mobile-nav {
+                display: none;
+            }
+
+            .mobile-nav.active {
+                display: block;
+            }
+
+            .convert-form {
+                flex-direction: column;
+            }
+
+            .chat-container {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header avec navigation -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">Mangrat <span>v4oplus</span></div>
+                <button class="mobile-menu-btn">☰</button>
+                <nav class="mobile-nav">
+                    <ul>
+                        <li><a href="#" class="nav-link active" data-section="login">Login</a></li>
+                        <li><a href="#" class="nav-link" data-section="chat">Chat</a></li>
+                        <li><a href="#" class="nav-link" data-section="dashboard">Dashboard</a></li>
+                        <li><a href="#" class="nav-link" data-section="transactions">Transactions</a></li>
+                        <li><a href="#" class="nav-link" data-section="payment">Paiement</a></li>
+                        <li><a href="#" class="nav-link" data-section="api-token">Token API</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main content avec différentes sections -->
+    <main class="container">
+        <!-- Messages d'alerte -->
+        <div id="alert-container"></div>
+
+        <!-- Section Login/Register -->
+        <section id="login" class="section active">
+            <h2>Connexion / Inscription</h2>
+            <div class="form-group">
+                <label for="login-email">Email</label>
+                <input type="email" id="login-email" placeholder="Votre email">
+            </div>
+            <div class="form-group">
+                <label for="login-password">Mot de passe</label>
+                <input type="password" id="login-password" placeholder="Votre mot de passe">
+            </div>
+            <button id="login-btn">Se connecter</button>
+            <button id="register-btn" class="secondary">Créer un compte</button>
+        </section>
+
+        <!-- Section Chat -->
+        <section id="chat" class="section">
+            <h2>Chat avec l'IA</h2>
+            <div class="chat-container">
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message ai-message">Bonjour ! Je suis Mangrat v4oplus. Comment puis-je vous aider aujourd'hui ?</div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="chat-input" placeholder="Tapez votre message...">
+                    <button id="send-message">Envoyer</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section Dashboard -->
+        <section id="dashboard" class="section">
+            <h2>Tableau de bord</h2>
+            <div class="balance-card">
+                <h3>Votre solde</h3>
+                <div class="balance-amount" id="balance-amount">0 tokens</div>
+                <p>Actualisé à: <span id="balance-update-time">-</span></p>
+            </div>
+            
+            <h3>Convertir des tokens</h3>
+            <div class="form-group">
+                <label for="convert-amount">Montant à convertir</label>
+                <input type="number" id="convert-amount" placeholder="Montant">
+            </div>
+            <div class="form-group">
+                <label for="convert-from">De</label>
+                <select id="convert-from">
+                    <option value="USD">USD ($)</option>
+                    <option value="EUR">EUR (€)</option>
+                    <option value="tokens">Tokens</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="convert-to">Vers</label>
+                <select id="convert-to">
+                    <option value="tokens">Tokens</option>
+                    <option value="USD">USD ($)</option>
+                    <option value="EUR">EUR (€)</option>
+                </select>
+            </div>
+            <button id="convert-btn">Convertir</button>
+        </section>
+
+        <!-- Section Transactions -->
+        <section id="transactions" class="section">
+            <h2>Historique des transactions</h2>
+            <div class="transactions-list" id="transactions-list">
+                <!-- Les transactions seront chargées ici -->
+            </div>
+        </section>
+
+        <!-- Section Paiement -->
+        <section id="payment" class="section">
+            <h2>Recharger votre compte</h2>
+            <div class="form-group">
+                <label for="payment-amount">Montant (USD)</label>
+                <input type="number" id="payment-amount" placeholder="Montant en USD" min="1" step="1">
+            </div>
+            <button id="payment-btn">Payer avec Stripe</button>
+        </section>
+
+        <!-- Section Token API -->
+        <section id="api-token" class="section">
+            <h2>Gestion du token API</h2>
+            <div class="form-group">
+                <label for="api-token-display">Votre token API</label>
+                <input type="text" id="api-token-display" readonly placeholder="Connectez-vous pour voir votre token">
+            </div>
+            <button id="generate-token-btn">Générer un nouveau token</button>
+            <button id="copy-token-btn" class="secondary">Copier le token</button>
+        </section>
+    </main>
+
+    <!-- Footer avec section À propos -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <button class="about-btn" id="about-btn">À propos de Mangrat</button>
+                <div class="about-content" id="about-content">
+                    <h3>Notre vision</h3>
+                    <p>Mangrat vise à démocratiser l'accès à l'intelligence artificielle en fournissant des modèles performants et accessibles à tous. Notre plateforme combine puissance et simplicité d'utilisation.</p>
+                    
+                    <h3>Modèles futurs</h3>
+                    <ul class="model-list">
+                        <li><strong>Mangrat v4oclark</strong> - Compétences IA avancées avec capacités étendues de raisonnement</li>
+                        <li><strong>Mangrat v3.1oflash</strong> - Réponses ultra-rapides et légères pour une expérience fluide</li>
+                        <li><strong>Mangrat voPro</strong> - Compétences professionnelles et API avancée pour les entreprises</li>
+                    </ul>
+                </div>
+                <div class="signature">Créé par Mauricio</div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Configuration
+        const API_BASE = "https://sarver-fullstack-4.onrender.com";
+
+        // Éléments DOM
+        const sections = document.querySelectorAll('.section');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const mobileNav = document.querySelector('.mobile-nav');
+        const aboutBtn = document.getElementById('about-btn');
+        const aboutContent = document.getElementById('about-content');
+        const alertContainer = document.getElementById('alert-container');
+
+        // État de l'application
+        let currentUser = null;
+        let apiToken = localStorage.getItem('apiToken');
+        let jwtToken = localStorage.getItem('jwtToken');
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            initApp();
+            setupEventListeners();
+        });
+
+        function initApp() {
+            // Vérifier si l'utilisateur est connecté
+            checkAuthStatus();
+            
+            // Configurer le routage
+            setupRouting();
+            
+            // Afficher/masquer le menu mobile
+            setupMobileMenu();
+            
+            // Configurer la section "À propos"
+            aboutBtn.addEventListener('click', function() {
+                aboutContent.classList.toggle('expanded');
+                aboutBtn.textContent = aboutContent.classList.contains('expanded') 
+                    ? 'Fermer' : 'À propos de Mangrat';
+            });
+        }
+
+        function setupEventListeners() {
+            // Login/Register
+            document.getElementById('login-btn').addEventListener('click', login);
+            document.getElementById('register-btn').addEventListener('click', register);
+            
+            // Chat
+            document.getElementById('send-message').addEventListener('click', sendChatMessage);
+            document.getElementById('chat-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') sendChatMessage();
+            });
+            
+            // Dashboard
+            document.getElementById('convert-btn').addEventListener('click', convertCurrency);
+            
+            // Payment
+            document.getElementById('payment-btn').addEventListener('click', createPayment);
+            
+            // API Token
+            document.getElementById('generate-token-btn').addEventListener('click', generateApiToken);
+            document.getElementById('copy-token-btn').addEventListener('click', copyApiToken);
+        }
+
+        function setupRouting() {
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const sectionId = this.getAttribute('data-section');
+                    
+                    // Mettre à jour la navigation
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Afficher la section correspondante
+                    sections.forEach(s => s.classList.remove('active'));
+                    document.getElementById(sectionId).classList.add('active');
+                    
+                    // Charger les données si nécessaire
+                    if (sectionId === 'dashboard') {
+                        loadBalance();
+                    } else if (sectionId === 'transactions') {
+                        loadTransactions();
+                    } else if (sectionId === 'api-token') {
+                        displayApiToken();
+                    }
+                    
+                    // Fermer le menu mobile après sélection
+                    if (window.innerWidth <= 768) {
+                        mobileNav.classList.remove('active');
+                    }
+                });
+            });
+        }
+
+        function setupMobileMenu() {
+            mobileMenuBtn.addEventListener('click', function() {
+                mobileNav.classList.toggle('active');
+            });
+        }
+
+        function checkAuthStatus() {
+            if (jwtToken) {
+                // L'utilisateur est connecté
+                updateUIForLoggedInUser();
+            } else {
+                // L'utilisateur n'est pas connecté
+                updateUIForLoggedOutUser();
+            }
+        }
+
+        function updateUIForLoggedInUser() {
+            // Mettre à jour l'interface pour un utilisateur connecté
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.style.display = 'inline-block';
+            });
+            
+            // Charger les données utilisateur
+            loadBalance();
+            loadTransactions();
+            displayApiToken();
+        }
+
+        function updateUIForLoggedOutUser() {
+            // Masquer les sections qui nécessitent une connexion
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.getAttribute('data-section') !== 'login' && 
+                    link.getAttribute('data-section') !== 'chat') {
+                    link.style.display = 'none';
+                }
+            });
+            
+            // Afficher la section de login par défaut
+            sections.forEach(s => s.classList.remove('active'));
+            document.getElementById('login').classList.add('active');
+            
+            // Mettre à jour la navigation
+            navLinks.forEach(l => l.classList.remove('active'));
+            document.querySelector('[data-section="login"]').classList.add('active');
+        }
+
+        function showAlert(message, type = 'success') {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            
+            alertContainer.appendChild(alert);
+            
+            // Supprimer l'alerte après 5 secondes
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        // Fonctions d'authentification
+        async function login() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            if (!email || !password) {
+                showAlert('Veuillez remplir tous les champs', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Connexion réussie
+                    jwtToken = data.token;
+                    localStorage.setItem('jwtToken', jwtToken);
+                    
+                    showAlert('Connexion réussie !');
+                    updateUIForLoggedInUser();
+                    
+                    // Basculer vers le dashboard
+                    document.querySelector('[data-section="dashboard"]').click();
+                } else {
+                    showAlert(data.message || 'Erreur de connexion', 'error');
+                }
+            } catch (error) {
+                showAlert('Erreur de connexion au serveur', 'error');
+                console.error('Login error:', error);
+            }
+        }
+
+        async function register() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            if (!email || !password) {
+                showAlert('Veuillez remplir tous les champs', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Inscription réussie
+                    showAlert('Compte créé avec succès ! Vous pouvez maintenant vous connecter.');
+                } else {
+                    showAlert(data.message || 'Erreur lors de la création du compte', 'error');
+                }
+            } catch (error) {
+                showAlert('Erreur de connexion au serveur', 'error');
+                console.error('Register error:', error);
+            }
+        }
+
+        // Fonctions de chat
+        async function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Ajouter le message de l'utilisateur au chat
+            addMessageToChat(message, 'user');
+            input.value = '';
+            
+            try {
+                let endpoint = `${API_BASE}/chat`;
+                let options = {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message })
+                };
+                
+                // Si l'utilisateur est connecté, utiliser l'endpoint avec token
+                if (jwtToken) {
+                    endpoint = `${API_BASE}/v1/chat/completions`;
+                    options.headers.Authorization = `Bearer ${jwtToken}`;
+                }
+                
+                const response = await fetch(endpoint, options);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Ajouter la réponse de l'IA au chat
+                    addMessageToChat(data.response || data.message, 'ai');
+                } else {
+                    addMessageToChat('Désolé, une erreur s\'est produite. Veuillez réessayer.', 'ai');
+                }
+            } catch (error) {
+                addMessageToChat('Erreur de connexion. Veuillez vérifier votre connexion internet.', 'ai');
+                console.error('Chat error:', error);
+            }
+        }
+
+        function addMessageToChat(message, sender) {
+            const messagesContainer = document.getElementById('chat-messages');
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${sender}-message`;
+            messageElement.textContent = message;
+            
+            messagesContainer.appendChild(messageElement);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Fonctions du dashboard
+        async function loadBalance() {
+            if (!jwtToken) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/user/balance`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${jwtToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('balance-amount').textContent = `${data.balance} tokens`;
+                    document.getElementById('balance-update-time').textContent = new Date().toLocaleTimeString();
+                }
+            } catch (error) {
+                console.error('Balance load error:', error);
+            }
+        }
+
+        async function convertCurrency() {
+            if (!jwtToken) {
+                showAlert('Veuillez vous connecter pour effectuer cette action', 'error');
+                return;
+            }
+            
+            const amount = document.getElementById('convert-amount').value;
+            const from = document.getElementById('convert-from').value;
+            const to = document.getElementById('convert-to').value;
+            
+            if (!amount || amount <= 0) {
+                showAlert('Veuillez entrer un montant valide', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/user/convert`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${jwtToken}`
+                    },
+                    body: JSON.stringify({ amount, from, to })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showAlert(`Conversion réussie: ${amount} ${from} -> ${data.result} ${to}`);
+                    loadBalance(); // Recharger le solde
+                } else {
+                    showAlert(data.message || 'Erreur lors de la conversion', 'error');
+                }
+            } catch (error) {
+                showAlert('Erreur de connexion au serveur', 'error');
+                console.error('Convert error:', error);
+            }
+        }
+
+        // Fonctions des transactions
+        async function loadTransactions() {
+            if (!jwtToken) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/transactions`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${jwtToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const transactions = await response.json();
+                    displayTransactions(transactions);
+                }
+            } catch (error) {
+                console.error('Transactions load error:', error);
+            }
+        }
+
+        function displayTransactions(transactions) {
+            const container = document.getElementById('transactions-list');
+            container.innerHTML = '';
+            
+            if (!transactions || transactions.length === 0) {
+                container.innerHTML = '<p>Aucune transaction à afficher</p>';
+                return;
+            }
+            
+            transactions.forEach(transaction => {
+                const item = document.createElement('div');
+                item.className = 'transaction-item';
+                
+                const amountClass = transaction.amount >= 0 ? 'positive' : 'negative';
+                const sign = transaction.amount >= 0 ? '+' : '';
+                
+                item.innerHTML = `
+                    <div class="transaction-info">
+                        <div class="transaction-type">${transaction.type}</div>
+                        <div class="transaction-date">${new Date(transaction.date).toLocaleDateString()}</div>
+                    </div>
+                    <div class="transaction-amount ${amountClass}">${sign}${transaction.amount} ${transaction.currency}</div>
+                `;
+                
+                container.appendChild(item);
+            });
+        }
+
+        // Fonctions de paiement
+        async function createPayment() {
+            if (!jwtToken) {
+                showAlert('Veuillez vous connecter pour effectuer un paiement', 'error');
+                return;
+            }
+            
+            const amount = document.getElementById('payment-amount').value;
+            
+            if (!amount || amount < 1) {
+                showAlert('Veuillez entrer un montant valide (minimum 1 USD)', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/payment/create`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${jwtToken}`
+                    },
+                    body: JSON.stringify({ amount })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Rediriger vers la page de paiement Stripe
+                    window.location.href = data.url;
+                } else {
+                    showAlert(data.message || 'Erreur lors de la création du paiement', 'error');
+                }
+            } catch (error) {
+                showAlert('Erreur de connexion au serveur', 'error');
+                console.error('Payment error:', error);
+            }
+        }
+
+        // Fonctions du token API
+        function displayApiToken() {
+            if (!jwtToken) {
+                document.getElementById('api-token-display').value = 'Connectez-vous pour voir votre token';
+                return;
+            }
+            
+            const token = localStorage.getItem('apiToken');
+            document.getElementById('api-token-display').value = token || 'Aucun token généré';
+        }
+
+        async function generateApiToken() {
+            if (!jwtToken) {
+                showAlert('Veuillez vous connecter pour générer un token API', 'error');
+                return;
+            }
+            
+            try {
+                // Déterminer l'endpoint en fonction du rôle utilisateur
+                const endpoint = `${API_BASE}/user/api-token`;
+                
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${jwtToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    apiToken = data.token;
+                    localStorage.setItem('apiToken', apiToken);
+                    displayApiToken();
+                    showAlert('Nouveau token API généré avec succès');
+                } else {
+                    showAlert(data.message || 'Erreur lors de la génération du token', 'error');
+                }
+            } catch (error) {
+                showAlert('Erreur de connexion au serveur', 'error');
+                console.error('Token generation error:', error);
+            }
+        }
+
+        function copyApiToken() {
+            const tokenInput = document.getElementById('api-token-display');
+            
+            if (!tokenInput.value || tokenInput.value === 'Aucun token généré' || 
+                tokenInput.value === 'Connectez-vous pour voir votre token') {
+                showAlert('Aucun token à copier', 'error');
+                return;
+            }
+            
+            tokenInput.select();
+            document.execCommand('copy');
+            
+            showAlert('Token copié dans le presse-papiers');
+        }
+    </script>
+</body>
+</html>
