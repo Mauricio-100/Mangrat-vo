@@ -2,97 +2,116 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Mangrat Frontend</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mangrat AI Chat</title>
 <style>
-  body { font-family: Arial, sans-serif; background: #1e1e1e; color: #fff; margin: 0; padding: 0; }
-  #app { max-width: 600px; margin: 50px auto; padding: 20px; background: #2c2c2c; border-radius: 8px; }
-  input, button { padding: 10px; margin: 5px 0; width: 100%; border-radius: 4px; border: none; }
-  button { background: #4caf50; color: white; cursor: pointer; }
-  button:hover { background: #45a049; }
-  #chatLog { height: 200px; overflow-y: auto; background: #111; padding: 10px; margin-bottom: 10px; border-radius: 4px; }
-  .message { margin: 5px 0; }
-  .user { color: #4caf50; }
-  .bot { color: #f1c40f; }
+    /* ===== Reset & Base ===== */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: #f5f6fa; color: #333; display: flex; flex-direction: column; min-height: 100vh; }
+    a { text-decoration: none; color: inherit; }
+
+    /* ===== Header ===== */
+    header { background-color: #2f3640; color: #fff; padding: 1rem 2rem; text-align: center; font-size: 1.5rem; font-weight: bold; }
+
+    /* ===== Chat Container ===== */
+    .chat-container { flex: 1; display: flex; flex-direction: column; max-width: 800px; margin: 2rem auto; background-color: #fff; border-radius: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); overflow: hidden; }
+    .messages { flex: 1; padding: 1rem; overflow-y: auto; }
+    .message { margin-bottom: 1rem; display: flex; flex-wrap: wrap; }
+    .message.user { justify-content: flex-end; }
+    .message.user .bubble { background-color: #4cd137; color: #fff; }
+    .message.ai { justify-content: flex-start; }
+    .message.ai .bubble { background-color: #dcdde1; color: #2f3640; }
+
+    .bubble { padding: 0.7rem 1rem; border-radius: 20px; max-width: 70%; word-wrap: break-word; }
+
+    /* ===== Input ===== */
+    .input-container { display: flex; border-top: 1px solid #dcdde1; }
+    input { flex: 1; padding: 1rem; border: none; font-size: 1rem; }
+    input:focus { outline: none; }
+    button { padding: 1rem 1.5rem; border: none; background-color: #273c75; color: #fff; font-weight: bold; cursor: pointer; transition: 0.2s; }
+    button:hover { background-color: #192a56; }
+
+    /* ===== Footer ===== */
+    footer { background-color: #2f3640; color: #fff; text-align: center; padding: 1rem 2rem; font-size: 0.9rem; }
+
+    /* ===== Scrollbar ===== */
+    .messages::-webkit-scrollbar { width: 8px; }
+    .messages::-webkit-scrollbar-thumb { background: #718093; border-radius: 4px; }
+    .messages::-webkit-scrollbar-track { background: #f5f6fa; }
+    
+    /* ===== Responsive ===== */
+    @media (max-width: 600px) {
+        .chat-container { margin: 1rem; }
+        .bubble { max-width: 85%; }
+        button { padding: 0.8rem 1rem; font-size: 0.9rem; }
+    }
 </style>
 </head>
 <body>
-<div id="app">
-  <h2>Mangrat Frontend</h2>
-  
-  <div id="chatLog"></div>
-  <input type="text" id="chatInput" placeholder="Tape ton message..." />
-  <button onclick="sendChat()">Envoyer</button>
 
-  <hr>
+<header>Mangrat AI Chat</header>
 
-  <input type="number" id="usdAmount" placeholder="Montant USD" />
-  <button onclick="convertUSD()">Convertir en tokens</button>
-  <div id="conversionResult"></div>
+<div class="chat-container">
+    <div class="messages" id="messages"></div>
+    <div class="input-container">
+        <input type="text" id="messageInput" placeholder="Écris ton message ici...">
+        <button id="sendBtn">Envoyer</button>
+    </div>
 </div>
 
+<footer>Créé par Mauricio Mangituka 2025 ✨</footer>
+
 <script>
-// ----- Ton token qui sert de "connexion" -----
-const token = "sk-6ec147262d78ceba829992d2f8a144c0e6835b4a5ada98de";
+const messagesEl = document.getElementById("messages");
+const messageInput = document.getElementById("messageInput");
+const sendBtn = document.getElementById("sendBtn");
 
-// ----- URL interne cachée (non visible à l’utilisateur) -----
-const _serverURL = "https://sarver-fullstack-4.onrender.com";
+// Remplace par ton token API Mangrat
+const API_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzU3OTgxNTc1LCJleHAiOjE3NTg1ODYzNzV9.RCH83gMFr3yJgkGyYLO6DhRuLtzaeITu9UkNIM6yZms";
 
-// ----- Chat -----
-async function sendChat() {
-  const input = document.getElementById("chatInput");
-  const message = input.value;
-  if (!message) return;
+async function sendMessage(message) {
+    // Affiche le message utilisateur
+    appendMessage("user", message);
 
-  appendMessage("user", message);
-  input.value = "";
+    try {
+        const res = await fetch("/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${API_TOKEN}`
+            },
+            body: JSON.stringify({ message })
+        });
 
-  try {
-    const res = await fetch(_serverURL + "/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + token
-      },
-      body: JSON.stringify({ message })
-    });
-    const data = await res.json();
-    appendMessage("bot", data.reply || "Pas de réponse.");
-  } catch (e) {
-    appendMessage("bot", "Erreur serveur.");
-    console.error(e);
-  }
+        const data = await res.json();
+        appendMessage("ai", data.reply || "Erreur du serveur.");
+    } catch (err) {
+        appendMessage("ai", "Erreur de connexion.");
+    }
 }
 
 function appendMessage(sender, text) {
-  const chatLog = document.getElementById("chatLog");
-  const div = document.createElement("div");
-  div.className = "message " + sender;
-  div.textContent = sender === "user" ? "Vous: " + text : "Mangrat: " + text;
-  chatLog.appendChild(div);
-  chatLog.scrollTop = chatLog.scrollHeight;
+    const msgEl = document.createElement("div");
+    msgEl.classList.add("message", sender);
+    const bubble = document.createElement("div");
+    bubble.classList.add("bubble");
+    bubble.textContent = text;
+    msgEl.appendChild(bubble);
+    messagesEl.appendChild(msgEl);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
 }
 
-// ----- Conversion USD → tokens -----
-async function convertUSD() {
-  const amount = document.getElementById("usdAmount").value;
-  if (!amount) return;
+sendBtn.addEventListener("click", () => {
+    const msg = messageInput.value.trim();
+    if (!msg) return;
+    sendMessage(msg);
+    messageInput.value = "";
+});
 
-  try {
-    const res = await fetch(_serverURL + "/user/convert", { // À adapter si ton endpoint diffère
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + token
-      },
-      body: JSON.stringify({ from: "USD", to: "tokens", amount: parseFloat(amount) })
-    });
-    const data = await res.json();
-    document.getElementById("conversionResult").textContent = `Résultat: ${data.converted || "Erreur"} tokens`;
-  } catch (e) {
-    document.getElementById("conversionResult").textContent = "Erreur serveur.";
-    console.error(e);
-  }
-}
+messageInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") sendBtn.click();
+});
 </script>
+
 </body>
 </html>
